@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { FormEvent } from 'react';
 import { useWeather } from '../context/WeatherContext';
 import { SearchContainer, Input, Button } from './styles';
@@ -50,9 +50,9 @@ export const SearchBar = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState<City[]>([]);
   const { setCurrentCity } = useWeather();
-  const debounceTimeout = useRef<NodeJS.Timeout>();
+  const debounceTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  const fetchCitySuggestions = async (query: string) => {
+  const fetchCitySuggestions = useCallback(async function fetchCitySuggestionsImpl(query: string): Promise<void> {
     if (!query.trim()) {
       setSuggestions([]);
       return;
@@ -75,7 +75,7 @@ export const SearchBar = () => {
       console.error('Error fetching city suggestions:', error);
       setSuggestions([]);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (debounceTimeout.current) {
@@ -84,7 +84,7 @@ export const SearchBar = () => {
 
     if (searchTerm) {
       debounceTimeout.current = setTimeout(() => {
-        fetchCitySuggestions(searchTerm);
+        void fetchCitySuggestions(searchTerm);
       }, 300);
     } else {
       setSuggestions([]);
@@ -95,7 +95,7 @@ export const SearchBar = () => {
         clearTimeout(debounceTimeout.current);
       }
     };
-  }, [searchTerm]);
+  }, [searchTerm, fetchCitySuggestions]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();

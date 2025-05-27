@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useWeatherQuery } from '../hooks/useWeatherQueries';
 import { useWeather } from '../context/WeatherContext';
+import { skipToken } from '@tanstack/react-query';
 
 export const LastUpdated = () => {
   const { currentCity } = useWeather();
-  const { dataUpdatedAt } = useWeatherQuery(currentCity);
+  const { dataUpdatedAt } = useWeatherQuery(currentCity ?? skipToken);
   const [lastUpdated, setLastUpdated] = useState('');
 
   useEffect(() => {

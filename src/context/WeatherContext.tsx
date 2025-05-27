@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { TemperatureUnit } from '../types/weather';
 import { useWeatherQuery, useForecastQuery } from '../hooks/useWeatherQueries';
+import { skipToken } from '@tanstack/react-query';
 
 interface WeatherContextType {
   currentCity: string | null;
@@ -27,15 +28,13 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
 
   const { 
     isLoading: isLoadingWeather, 
-    error: weatherError,
-    refetch: refetchWeather
-  } = useWeatherQuery(currentCity);
+    error: weatherError
+  } = useWeatherQuery(currentCity ?? skipToken);
   
   const { 
     isLoading: isLoadingForecast, 
-    error: forecastError,
-    refetch: refetchForecast
-  } = useForecastQuery(currentCity);
+    error: forecastError
+  } = useForecastQuery(currentCity ?? skipToken);
 
   const handleSetCity = useCallback((city: string) => {
     if (!city) return;
@@ -46,9 +45,7 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
   const clearError = useCallback(() => {
     localStorage.removeItem('lastCity');
     setCurrentCity(null);
-    refetchWeather();
-    refetchForecast();
-  }, [refetchWeather, refetchForecast]);
+  }, []);
 
   const toggleUnit = useCallback(() => {
     setUnit(prev => {

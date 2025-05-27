@@ -1,4 +1,5 @@
 import type { WeatherData, ForecastData } from '../types/weather';
+import { skipToken } from '@tanstack/react-query';
 
 const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY || '8c86a6ceef5cf59561b3bf30e060fb2b';
 const API_URL = import.meta.env.VITE_OPENWEATHER_API_URL || 'https://api.openweathermap.org/data/2.5';
@@ -68,6 +69,8 @@ export const getWeatherIconUrl = (iconCode: string): string => {
 // Query keys for React Query
 export const weatherKeys = {
   all: ['weather'] as const,
-  current: (city: string) => [...weatherKeys.all, 'current', city] as const,
-  forecast: (city: string) => [...weatherKeys.all, 'forecast', city] as const,
+  current: (city: string | typeof skipToken) => 
+    city === skipToken ? [...weatherKeys.all, 'current'] as const : [...weatherKeys.all, 'current', city] as const,
+  forecast: (city: string | typeof skipToken) => 
+    city === skipToken ? [...weatherKeys.all, 'forecast'] as const : [...weatherKeys.all, 'forecast', city] as const,
 }; 

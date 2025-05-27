@@ -4,6 +4,7 @@ import { useWeatherQuery } from '../hooks/useWeatherQueries';
 import { getWeatherIconUrl } from '../services/weatherService';
 import { WiHumidity, WiStrongWind, WiThermometer } from 'react-icons/wi';
 import { LastUpdated } from './LastUpdated';
+import { skipToken } from '@tanstack/react-query';
 
 interface WeatherDetailProps {
   icon: React.ComponentType<{ size: number }>;
@@ -28,7 +29,7 @@ const WeatherDetail = ({ icon: Icon, label, value }: WeatherDetailProps) => (
 
 export const WeatherDisplay = () => {
   const { currentCity, unit, toggleUnit } = useWeather();
-  const { data: weatherData } = useWeatherQuery(currentCity);
+  const { data: weatherData } = useWeatherQuery(currentCity ?? skipToken);
 
   if (!weatherData || !currentCity) return null;
 

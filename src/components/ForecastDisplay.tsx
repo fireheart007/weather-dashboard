@@ -3,6 +3,7 @@ import { useWeather } from '../context/WeatherContext';
 import { useForecastQuery } from '../hooks/useWeatherQueries';
 import { getWeatherIconUrl } from '../services/weatherService';
 import type { ForecastItem } from '../types/weather';
+import { skipToken } from '@tanstack/react-query';
 
 const convertTemp = (celsius: number, unit: 'celsius' | 'fahrenheit'): number => {
   if (unit === 'fahrenheit') {
@@ -13,7 +14,7 @@ const convertTemp = (celsius: number, unit: 'celsius' | 'fahrenheit'): number =>
 
 export const ForecastDisplay = () => {
   const { currentCity, unit } = useWeather();
-  const { data: forecastData } = useForecastQuery(currentCity);
+  const { data: forecastData } = useForecastQuery(currentCity ?? skipToken);
 
   if (!forecastData || !currentCity) return null;
 
