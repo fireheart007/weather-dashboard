@@ -99,8 +99,9 @@ export const SearchBar = () => {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (searchTerm.trim()) {
-      setCurrentCity(searchTerm.trim());
+    const trimmedSearchTerm = searchTerm.trim();
+    if (trimmedSearchTerm) {
+      setCurrentCity(trimmedSearchTerm);
       setSearchTerm('');
       setSuggestions([]);
     }

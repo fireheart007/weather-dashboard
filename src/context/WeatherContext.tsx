@@ -16,9 +16,9 @@ interface WeatherContextType {
 const WeatherContext = createContext<WeatherContextType | undefined>(undefined);
 
 export const WeatherProvider = ({ children }: { children: ReactNode }) => {
-  // Initialize state from localStorage
   const [currentCity, setCurrentCity] = useState<string | null>(() => {
-    return localStorage.getItem('lastCity');
+    const savedCity = localStorage.getItem('lastCity');
+    return savedCity || null;
   });
   
   const [unit, setUnit] = useState<TemperatureUnit>(() => {
@@ -38,13 +38,14 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
   } = useForecastQuery(currentCity);
 
   const handleSetCity = useCallback((city: string) => {
+    if (!city) return;
     localStorage.setItem('lastCity', city);
     setCurrentCity(city);
   }, []);
 
   const clearError = useCallback(() => {
-    setCurrentCity(null);
     localStorage.removeItem('lastCity');
+    setCurrentCity(null);
     refetchWeather();
     refetchForecast();
   }, [refetchWeather, refetchForecast]);
@@ -57,21 +58,20 @@ export const WeatherProvider = ({ children }: { children: ReactNode }) => {
     });
   }, []);
 
-  // Combine errors from both queries
   const error = weatherError?.message || forecastError?.message || null;
 
+  const value: WeatherContextType = {
+    currentCity,
+    loading: isLoadingWeather || isLoadingForecast,
+    error,
+    unit,
+    setCurrentCity: handleSetCity,
+    clearError,
+    toggleUnit,
+  };
+
   return (
-    <WeatherContext.Provider
-      value={{
-        currentCity,
-        loading: isLoadingWeather || isLoadingForecast,
-        error,
-        unit,
-        setCurrentCity: handleSetCity,
-        clearError,
-        toggleUnit,
-      }}
-    >
+    <WeatherContext.Provider value={value}>
       {children}
     </WeatherContext.Provider>
   );
